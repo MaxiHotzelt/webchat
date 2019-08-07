@@ -18,14 +18,26 @@
 
 body {
     height: 100vh;
-    padding: .5em;
+
     background-color: #1F1B24;
     color: white;
+
+    transition: all .5s linear;
+}
+
+body>header {
+    height: 5vh;
+    padding: .5em;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #1F1F1F;
 }
 
 #wrapper {
-    height: 100%;
-
+    height: 95vh;
+    padding: .5em;
     display: flex;
     flex-wrap: wrap;
 }
@@ -43,6 +55,8 @@ body {
     padding: .5em;
 
     background-color: #423D46;
+
+    transition: background-color .5s linear;
 }
 
 .message:last-of-type {
@@ -77,10 +91,64 @@ body {
 }
 
 #inputarea textarea {
-    width: 100%;
+    width: 90%;
     padding: .2em;
+    color: white;
 
     background-color: #423D46;
     border: none;
-    resize: vertical;
+    resize: none;
+}
+
+#inputarea button {
+    width: 10%;
+    font-size: 5vw;
+    color: white;
+
+    border-radius: 0 50px 50px 0;
+    border: 0px solid black;
+    cursor: pointer;
+    background-color: #423D46;
+}
+
+
+/*
+    Theme Toggler
+*/
+
+#themeToggle {
+    cursor: pointer;
+}
+
+#themeToggle>div {
+    width: 60px;
+    height: 20px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+
+    box-sizing: content-box;
+
+    background-color: white;
+    border-radius: 50px;
+}
+
+#themeToggle [data-theme] {
+    width: 20px;
+    height: 20px;
+    border-radius: 50px;
+
+
+}
+
+#themeToggle [data-theme="dark"] {
+    transition: all .5s linear;
+    background-color: #BB86FC;
+    margin-left: 0px;
+}
+
+#themeToggle [data-theme="light"] {
+    transition: all .5s linear;
+    margin-left: 40px;
+    background-color: #6200EE;
 }
