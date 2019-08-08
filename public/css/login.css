@@ -50,4 +50,6 @@
     color: white;
     background-color: transparent;
     font-size: .8em;
+
+    cursor: pointer;
 }

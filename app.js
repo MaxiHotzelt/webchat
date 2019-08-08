@@ -6,10 +6,14 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
 
-app.use(express.static("view"));
+app.use(express.static("public"));
+
+app.get('/chat', (req, res) => {
+    res.sendFile(__dirname + "/public/html/chat.html");
+});
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/view/html/login.html");
+    res.sendFile(__dirname + "/public/html/login.html");
 });
 
 io.on('connection', (socket) => {
