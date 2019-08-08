@@ -1,0 +1,53 @@
+#login-page #wrapper {
+    font-size: 2em;
+}
+
+#login-page #intro span,
+#login-page #loginarea input {
+    display: block;
+}
+
+#login-page #intro span {
+    color: #bcbcbc;
+    font-size: .9em;
+}
+
+
+#login-page #wrapper {
+    align-content: center;
+}
+
+#login-page #wrapper>header {
+    margin-bottom: 3em;
+    width: 100%;
+
+    color: #03DAC5;
+}
+
+
+#login-page #intro {
+    margin-bottom: 2.5em;
+}
+
+#login-page #loginarea input,
+#login-page #loginarea {
+    width: 100%;
+}
+
+#login-page #loginarea input {
+    margin-bottom: 1.5em;
+
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: .8em;
+    font-weight: bold;
+}
+
+
+#login-page #loginarea button {
+    border: none;
+    color: white;
+    background-color: transparent;
+    font-size: .8em;
+}

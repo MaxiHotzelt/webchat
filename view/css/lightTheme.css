@@ -1,0 +1,26 @@
+#themeToggle [data-theme="light"] {
+    transition: all .5s linear;
+    margin-left: 40px;
+    background-color: #6200EE;
+}
+
+body {
+    background-color: white;
+}
+
+#login-page,
+#login-page #loginarea button,
+#login-page #loginarea input {
+    color: black;
+}
+
+#login-page #wrapper>header {
+    color: #005457;
+}
+
+#inputarea>button,
+#inputarea>textarea,
+#messages .message {
+    background-color: #93b1a8;
+    background-color: #8b8b8b;
+}

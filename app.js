@@ -9,7 +9,7 @@ const port = process.env.PORT || 3000;
 app.use(express.static("view"));
 
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/view/index.html")
+    res.sendFile(__dirname + "/view/html/login.html");
 });
 
 io.on('connection', (socket) => {
