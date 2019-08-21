@@ -3,74 +3,107 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const session = require('express-session');
-// const users = require('./middleware/users');
-
 
 const port = process.env.PORT || 3000;
-app.set('trust proxy', 1);
-app.use(express.static("public"));
-app.use(express.urlencoded({
-    extended: true
-})) // for parsing application/x-www-form-urlencoded
-app.use(session({
-    name: "myName",
-    resave: false,
+
+const messages = [];
+
+
+
+const sessionMiddleware = session({
+    name: 'userinfo',
+    key: 'user_sid',
+    resave: true,
     saveUninitialized: false,
     secret: 'mySecret',
     cookie: {
-        secure: true,
         sameSite: true,
-        maxAge: 60000
+        maxAge: 60000 * 60
     }
-}));
-
-const checkLogin = (req, res, next) => {
-    console.log(req.session);
-    console.log(req.body.username);
-    if (!req.session.username) {
-        res.send('You are not authorized to view this page! Please Login first.');
-    } else {
-        next();
-    }
-}
-
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + "/public/html/login.html");
 });
 
-app.get('/chat', checkLogin, (req, res) => {
-    res.sendFile(__dirname + "/public/html/chat.html");
+app.use(express.static('public'));
+app.use(
+    express.urlencoded({
+        extended: true
+    })
+);
+app.use(
+    sessionMiddleware
+);
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/public/html/login.html');
+});
+
+app.get('/chat', (req, res) => {
+    res.sendFile(__dirname + '/public/html/chat.html');
 });
 
 app.post('/login', (req, res) => {
-    // if (users.getUsers().includes(req.body.username)) {
-    //     res.redirect('/');
-    // } else {
     req.session.username = req.body.username;
-    console.log(req.session);
-
-    // users.addUser(req.body.username);
+    console.log('session username: ' + req.session.username);
     return res.redirect('/chat');
-    // }
-
-    // res.redirect('/');
 });
 
+io.use(function (socket, next) {
+    sessionMiddleware(socket.client.request, socket.client.request.res, next);
+});
 
-io.on('connection', (socket) => {
-    console.log(socket.client.id + ' : Connected');
+io.on('connection', socket => {
+    console.log(socket.request.session.username + " has connected")
 
+
+    http.getConnections((err, num) => {
+        console.log(num);
+    });
+    //if there is no username, then redirect the user to the login page
+    if (!socket.request.session.username) {
+        console.log('redirecting');
+        socket.emit('redirect', '/');
+    } else {
+        messages.forEach(message => {
+            socket.emit('server message', message.username, message.timestamp, message.message);
+        });
+    }
     socket.on('disconnect', () => {
-        console.log(socket + ": Disconnected")
+        console.log(socket.request.session.username + " has disconnected");
     });
 
-    socket.on('chat message', (msg) => {
-        console.log('Message: ' + msg);
+    //listens to messages from clients
+    socket.on('client message', (msg) => {
+        const username = socket.request.session.username;
+        if (username) {
+            const today = new Date();
+            const time = today.getHours() + ':' + today.getMinutes();
+            messages.push({
+                username: username,
+                message: msg,
+                timestamp: time
+            })
 
-        socket.broadcast.emit('chat message', msg);
+            io.emit('server message', username, time, msg);
+        }
     });
+
 });
 
 http.listen(port, function () {
-    console.log('listening on *:3000');
+    console.log('listening on port: 3000');
 });
+
+process.on('exit', () => {
+    console.log('Process exit: About to exit.')
+});
+
+process.on('SIGINT', () => {
+    console.log('Process SIGINT: About to exit.')
+});
+
+http.on('close', () => {
+    console.log('On: About to exit.')
+});
+
+http.once('close', () => {
+    console.log('Once: About to exit.')
+})

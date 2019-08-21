@@ -10,12 +10,14 @@ const socket = io();
 
 
 // listen on chat messages from server
-socket.on('chat message', msg => {
-    const today = new Date();
-    const time = today.getHours() + ':' + today.getMinutes();
-
-    appendMessage(createMessage('User', time, msg));
+socket.on('server message', (username, time, msg) => {
+    appendMessage(createMessage(username, time, msg));
 });
+
+socket.on('redirect', (path) => {
+    console.log("redirected to " + path);
+    window.location.href = path;
+})
 
 /* 
     client stuff 
@@ -37,14 +39,10 @@ function addListeners() {
 }
 
 function sendMessage() {
-    const today = new Date();
-    const time = today.getHours() + ':' + today.getMinutes();
 
     if (inputArea.value !== '') {
         //send message to server
-        socket.emit('chat message', inputArea.value);
-
-        appendMessage(createMessage('User', time, inputArea.value));
+        socket.emit('client message', inputArea.value);
     }
 
     clearInputArea();
