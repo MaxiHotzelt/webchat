@@ -3,12 +3,11 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const session = require('express-session');
+const fs = require('fs');
 
 const port = process.env.PORT || 3000;
 
 const messages = [];
-
-
 
 const sessionMiddleware = session({
     name: 'userinfo',
@@ -36,13 +35,20 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/public/html/login.html');
 });
 
-app.get('/chat', (req, res) => {
+app.get('/chat', (req, res, next) => {
+    if (!req.session.username) {
+        console.log('[ERROR] no username was found');
+        res.redirect('/');
+    } else {
+        next();
+    }
+}, (req, res) => {
     res.sendFile(__dirname + '/public/html/chat.html');
 });
 
 app.post('/login', (req, res) => {
     req.session.username = req.body.username;
-    console.log('session username: ' + req.session.username);
+    console.log('[INFO] user logged in with name: ' + req.session.username);
     return res.redirect('/chat');
 });
 
@@ -52,14 +58,9 @@ io.use(function (socket, next) {
 
 io.on('connection', socket => {
     console.log(socket.request.session.username + " has connected")
-
-
-    http.getConnections((err, num) => {
-        console.log(num);
-    });
     //if there is no username, then redirect the user to the login page
     if (!socket.request.session.username) {
-        console.log('redirecting');
+        console.log('[ERROR] no username was found');
         socket.emit('redirect', '/');
     } else {
         messages.forEach(message => {
@@ -88,22 +89,30 @@ io.on('connection', socket => {
 
 });
 
+function saveMessages() {
+    fs.writeFile(__dirname + '/test.json', JSON.stringify(messages), (err) => {
+
+    });
+    console.log('[INFO] succesfully saved messages to JSON file');
+}
+
+function loadMessages() {
+
+    let data = fs.readFileSync(__dirname + '/test.json');
+    const loadedmsges = JSON.parse(data);
+    loadedmsges.forEach(message => {
+        messages.push(message);
+    });
+
+    console.log('[INFO] succesfully loaded messages from JSON file');
+}
+
 http.listen(port, function () {
     console.log('listening on port: 3000');
+    loadMessages();
 });
 
-process.on('exit', () => {
-    console.log('Process exit: About to exit.')
+process.on('SIGTERM', () => {
+    console.log('Process SIGTERM: About to exit.');
+    saveMessages();
 });
-
-process.on('SIGINT', () => {
-    console.log('Process SIGINT: About to exit.')
-});
-
-http.on('close', () => {
-    console.log('On: About to exit.')
-});
-
-http.once('close', () => {
-    console.log('Once: About to exit.')
-})
