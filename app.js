@@ -116,3 +116,8 @@ process.on('SIGTERM', () => {
     console.log('Process SIGTERM: About to exit.');
     saveMessages();
 });
+
+process.on('SIGINT', () => {
+    console.log('Process SIGTERM: About to exit.');
+    saveMessages();
+});

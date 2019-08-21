@@ -38,6 +38,11 @@ function addListeners() {
     });
 }
 
+function updateScroll() {
+    var element = document.getElementById("messages");
+    element.scrollTop = element.scrollHeight;
+}
+
 function sendMessage() {
 
     if (inputArea.value !== '') {
@@ -50,6 +55,7 @@ function sendMessage() {
 
 const appendMessage = messageNode => {
     messageArea.appendChild(messageNode);
+    updateScroll();
 };
 
 /**
