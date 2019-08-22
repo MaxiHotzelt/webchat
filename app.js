@@ -46,6 +46,8 @@ app.get('/chat', (req, res, next) => {
     res.sendFile(__dirname + '/public/html/chat.html');
 });
 
+
+
 app.post('/login', (req, res) => {
     req.session.username = req.body.username;
     console.log('[INFO] user logged in with name: ' + req.session.username);
@@ -65,6 +67,7 @@ io.on('connection', socket => {
     } else {
         messages.forEach(message => {
             socket.emit('server message', message.username, message.timestamp, message.message);
+
         });
     }
     socket.on('disconnect', () => {
@@ -84,10 +87,17 @@ io.on('connection', socket => {
             })
 
             io.emit('server message', username, time, msg);
+
+            socket.broadcast.emit('notification', username, msg);
         }
     });
 
 });
+
+
+
+
+
 
 function saveMessages() {
     fs.writeFile(__dirname + '/test.json', JSON.stringify(messages), (err) => {
@@ -118,6 +128,6 @@ process.on('SIGTERM', () => {
 });
 
 process.on('SIGINT', () => {
-    console.log('Process SIGTERM: About to exit.');
+    console.log('Process SIGINT: About to exit.');
     saveMessages();
 });

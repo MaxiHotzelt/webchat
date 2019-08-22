@@ -19,6 +19,10 @@ socket.on('redirect', (path) => {
     window.location.href = path;
 })
 
+socket.on('notification', (user, message) => {
+    notifyMe(user, message);
+})
+
 /* 
     client stuff 
 */
@@ -57,6 +61,44 @@ const appendMessage = messageNode => {
     messageArea.appendChild(messageNode);
     updateScroll();
 };
+
+function notifyMe(user, message) {
+    if (notifictionPermission() && document.visibilityState === 'hidden') {
+        new Notification(user, {
+            body: message
+        });
+    }
+}
+
+
+function test() {
+    setTimeout(() => {
+        console.log(document.visibilityState);
+        test();
+    }, 1000);
+}
+
+function notifictionPermission() {
+    if ('Notification' in window) {
+
+        if (Notification.permission === 'granted') {
+            return true;
+        } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission().then((result) => {
+                if (result === 'denied') {
+                    console.log("No permission for notifications...");
+                    return false;
+                } else if (result === 'granted') {
+                    return true;
+                }
+            })
+        }
+    }
+
+    return false;
+}
+
+
 
 /**
  * Creates a message element, which can be added to the dom
