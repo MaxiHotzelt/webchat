@@ -94,16 +94,11 @@ io.on('connection', socket => {
 
 });
 
-
-
-
-
-
 function saveMessages() {
     fs.writeFile(__dirname + '/test.json', JSON.stringify(messages), (err) => {
 
     });
-    console.log('[INFO] succesfully saved messages to JSON file');
+    console.log('[INFO] successfully saved messages to JSON file');
 }
 
 function loadMessages() {
@@ -114,7 +109,7 @@ function loadMessages() {
         messages.push(message);
     });
 
-    console.log('[INFO] succesfully loaded messages from JSON file');
+    console.log('[INFO] successfully loaded messages from JSON file');
 }
 
 http.listen(port, function () {

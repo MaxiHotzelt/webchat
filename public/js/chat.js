@@ -70,14 +70,6 @@ function notifyMe(user, message) {
     }
 }
 
-
-function test() {
-    setTimeout(() => {
-        console.log(document.visibilityState);
-        test();
-    }, 1000);
-}
-
 function notifictionPermission() {
     if ('Notification' in window) {
 
@@ -97,8 +89,6 @@ function notifictionPermission() {
 
     return false;
 }
-
-
 
 /**
  * Creates a message element, which can be added to the dom
