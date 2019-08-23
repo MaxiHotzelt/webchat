@@ -1,52 +1,38 @@
-const emojis = [{
-    key: ':burger:',
-    value: String.fromCodePoint(0x1F354)
-}, {
-    key: ':grinning:',
-    value: String.fromCodePoint(0x1F601)
-}, {
-    key: ':tears-of-joy:',
-    value: String.fromCodePoint(0x1F602)
-}, {
-    key: ':smile:',
-    value: String.fromCodePoint(0x1F603)
-}, {
-    key: ':smiling-eyes:',
-    value: String.fromCodePoint(0x1F604)
-}, {
-    key: ':smiling-eyes-sweat:',
-    value: String.fromCodePoint(0x1F605)
-}, {
-    key: ':smiling-closed-eyes:',
-    value: String.fromCodePoint(0x1F606)
-}, {
-    key: ':devil-smile:',
-    value: String.fromCodePoint(0x1F608)
-}, {
-    key: ':wink:',
-    value: String.fromCodePoint(0x1F609)
-}, {
-    key: ':blush:',
-    value: String.fromCodePoint(0x1F60A)
-}, {
-    key: ':tongue-smiling:',
-    value: String.fromCodePoint(0x1F60B)
-}, {
-    key: ':relieved:',
-    value: String.fromCodePoint(0x1F60C)
-}, {
-    key: ':thumbs-up:',
-    value: String.fromCodePoint(0x1F44D)
-}, {
-    key: ':thumbs-down:',
-    value: String.fromCodePoint(0x1F44E)
-}, {
-    key: ':ok-sign:',
-    value: String.fromCodePoint(0x1F44C)
-}, {
-    key: ':fist:',
-    value: String.fromCodePoint(0x1F44A)
-}];
+/*
+
+ Emojis
+
+*/
+
+const emojiJsonUrl = 'https://unpkg.com/emoji.json@12.1.0/emoji.json';
+let emojis = [];
+let colonCount = 0;
+
+init();
+
+
+async function fetchJson(urlPath) {
+    const data = await fetch(urlPath);
+    const json = await data.json();
+
+    return json;
+}
+
+/**
+ * This method fetches a json file, which includes an array of emoji objects. Some values of
+ * the objects are then edited to fit our needs.
+ * @param {String} urlPath - Path to the json file
+ */
+async function prepareEmojiJson(urlPath) {
+    const data = await fetchJson(urlPath);
+
+    data.forEach(emoji => {
+        emoji.codes = '0x' + emoji.codes;
+        emoji.name = ':' + emoji.name.replace(/\s/g, '-') + ':';
+    });
+
+    emojis = data;
+}
 
 /**
  * 
@@ -56,8 +42,8 @@ function checkForEmoji(message) {
     if (message.includes(':')) {
         console.log("searching...")
         emojis.forEach((emoji) => {
-            if (message.includes(emoji.key)) {
-                inputArea.value = message.replace(emoji.key, emoji.value);
+            if (message.includes(emoji.name)) {
+                inputArea.value = message.replace(emoji.name, String.fromCodePoint(emoji.codes));
             }
         })
     }
@@ -65,12 +51,16 @@ function checkForEmoji(message) {
 
 }
 
-inputArea.addEventListener('paste', () => {
-    setTimeout(() => {
-        checkForEmoji(inputArea.value);
-    }, 10);
-});
+function init() {
+    prepareEmojiJson(emojiJsonUrl);
 
-document.addEventListener('keyup', (e) => {
-    checkForEmoji(inputArea.value);
-})
+    inputArea.addEventListener('paste', () => {
+        setTimeout(() => {
+            checkForEmoji(inputArea.value);
+        }, 10);
+    });
+
+    document.addEventListener('keyup', (e) => {
+        checkForEmoji(inputArea.value);
+    })
+}
