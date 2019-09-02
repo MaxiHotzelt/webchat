@@ -22,7 +22,7 @@ socket.on('server message', (username, time, msg) => {
 });
 
 socket.on('server image', (username, time, imgPath) => {
-    let _imgPath = window.location.hostname + imgPath;
+    let _imgPath = '/uploads/' + imgPath;
     appendMessage(createImageMessage(username, time, _imgPath));
 });
 
