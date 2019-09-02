@@ -1,49 +1,71 @@
 <!DOCTYPE html>
 <html lang="de">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="stylesheet" href="../css/global.css" type="text/css" />
+        <link rel="stylesheet" href="../css/chat.css" type="text/css" />
+        <link
+            id="lightTheme"
+            rel="stylesheet"
+            href="../css/lightTheme.css"
+            type="text/css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="/siofu/client.js"></script>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="../css/global.css" type="text/css" />
-    <link rel="stylesheet" href="../css/chat.css" type="text/css" />
-    <link id="lightTheme" rel="stylesheet" href="../css/lightTheme.css" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto&display=swap" rel="stylesheet" />
-    <script src="/socket.io/socket.io.js"></script>
+        <title>Chatter</title>
+    </head>
 
-    <title>Chatter</title>
-</head>
+    <body>
+        <header id="header"></header>
+        <main id="wrapper">
+            <section id="messages">
+                <article class="message">
+                    <cite>Maxi</cite><time datetime="12:59">12:59 Uhr</time>
+                    <blockquote>
+                        Hallo
+                    </blockquote>
+                </article>
+                <article class="message">
+                    <cite>Micha</cite><time datetime="13:00">13:00 Uhr</time>
+                    <blockquote>
+                        Hallo zurück
+                    </blockquote>
+                </article>
+            </section>
+            <section id="inputarea">
+                <label id="upload-btn">
+                    <img src="../images/clip.png" alt="paperclip" />
+                    <input type="file" id="siofu_input" />
+                </label>
 
-<body>
-    <header id="header">
-
-    </header>
-    <main id="wrapper">
-        <section id="messages">
-            <article class="message">
-                <cite>Maxi</cite><time datetime="12:59">12:59 Uhr</time>
-                <blockquote>
-                    Hallo
-                </blockquote>
-            </article>
-            <article class="message">
-                <cite>Micha</cite><time datetime="13:00">13:00 Uhr</time>
-                <blockquote>
-                    Hallo zurück
-                </blockquote>
-            </article>
-        </section>
-        <section id="inputarea">
-            <textarea placeholder="Message..."></textarea>
-            <button>
-                <p>⏎</p>
-            </button>
-        </section>
-    </main>
-    <script src="../js/chat.js"></script>
-    <script src="../js/importHTML.js"></script>
-    <script src="../js/themetoggle.js"></script>
-    <script src='../js/emojis.js'></script>
-</body>
-
+                <textarea placeholder="Message..."></textarea>
+                <button>
+                    <p>⏎</p>
+                </button>
+            </section>
+            <!-- <div>
+                Icons made by
+                <a
+                    href="https://www.flaticon.com/authors/freepik"
+                    title="Freepik"
+                    >Freepik</a
+                >
+                from
+                <a href="https://www.flaticon.com/" title="Flaticon"
+                    >www.flaticon.com</a
+                >
+            </div> -->
+        </main>
+        <script src="../js/chat.js"></script>
+        <script src="../js/importHTML.js"></script>
+        <script src="../js/themetoggle.js"></script>
+        <script src="../js/emojis.js"></script>
+    </body>
 </html>
