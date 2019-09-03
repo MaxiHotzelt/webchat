@@ -6,6 +6,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-session": "^1.16.2",
+    "mongodb": "^3.3.2",
     "socket.io": "^2.2.0",
     "socketio-file-upload": "^0.7.0"
   },

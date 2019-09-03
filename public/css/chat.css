@@ -36,6 +36,7 @@
 
 .message img {
     max-height: 400px;
+    max-width: 100%;
     border-radius: 10px;
 }
 
@@ -71,6 +72,7 @@
 
 #inputarea textarea {
     width: calc(100% - 200px);
+    min-width: 70%;
     padding: 0.5em;
     font-size: 1em;
     color: white;

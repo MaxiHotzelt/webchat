@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="stylesheet" href="../css/global.css" type="text/css" />
+        <link rel="stylesheet" href="../css/login.css" type="text/css" />
+        <link
+            id="lightTheme"
+            rel="stylesheet"
+            href="../css/lightTheme.css"
+            type="text/css"
+        />
+        <link
+            href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto&display=swap"
+            rel="stylesheet"
+        />
+        <script src="/socket.io/socket.io.js"></script>
+
+        <title>Chatter</title>
+    </head>
+
+    <body id="login-page">
+        <header id="header"></header>
+        <main id="wrapper">
+            <header>
+                <h1>
+                    Chatter
+                </h1>
+            </header>
+            <article id="intro">
+                <p>
+                    Welcome,
+                    <span>
+                        enter a username and password to register to Chatter.
+                    </span>
+                </p>
+            </article>
+            <form id="loginarea" method="POST" action="/registerUser">
+                <fieldset>
+                    <input
+                        id="username"
+                        type="text"
+                        placeholder="Username"
+                        name="username"
+                    />
+                    <p id="isUserAvailable"></p>
+                </fieldset>
+
+                <input type="text" placeholder="Password" name="password" />
+                <button id="register-btn">Register</button>
+            </form>
+        </main>
+    </body>
+
+    <script src="../js/register.js"></script>
+    <script src="../js/importHTML.js"></script>
+    <script src="../js/themetoggle.js"></script>
+</html>
