@@ -12,8 +12,9 @@ const socket = io();
 const uploader = new SocketIOFileUpload(socket);
 uploader.listenOnInput(document.getElementById('siofu_input'));
 
+//send image to server
 uploader.addEventListener('complete', e => {
-    socket.emit('client image', e.file.name);
+    socket.emit('client image', e.file, e.file.name);
 });
 
 // listen on chat messages from server

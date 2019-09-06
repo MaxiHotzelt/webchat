@@ -5,14 +5,19 @@ const io = require('socket.io')(http);
 const siofu = require('socketio-file-upload');
 const session = require('express-session');
 const MongoClient = require('mongodb').MongoClient;
-const assert = require('assert');
+const mongoose = require('mongoose');
 const fs = require('fs');
 
-const port = process.env.PORT || 3000;
-const jsonSaveIntervalMs = 30000;
-
-const uri =
+const dbUrl =
     'mongodb+srv://admin:admin@webchatter-jwkgz.mongodb.net/test?retryWrites=true&w=majority';
+
+mongoose.connect(dbUrl, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+});
+
+const port = process.env.PORT || 3000;
+
 const messages = [];
 const users = [];
 
@@ -87,6 +92,8 @@ app.post('/registerUser', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
+    let foundUser = false;
+
     users.forEach(user => {
         if (
             user.username === req.body.username &&
@@ -94,13 +101,18 @@ app.post('/login', (req, res) => {
         ) {
             req.session.username = req.body.username;
             console.log(
-                '[INFO] user logged in with name: ' + req.session.username
+                '[INFO] user logged in with name: ' +
+                    req.session.username +
+                    ' - called in line ' +
+                    __line
             );
+            foundUser = true;
             return res.redirect('/chat');
         }
     });
-
-    return res.redirect('/');
+    if (!foundUser) {
+        return res.redirect('/');
+    }
 });
 
 io.use(function(socket, next) {
@@ -111,7 +123,7 @@ io.on('connection', socket => {
     console.log(socket.request.session.username + ' has connected');
     //if there is no username, then redirect the user to the login page
     if (!socket.request.session.username) {
-        console.log('[ERROR] no username was found');
+        console.log('[ERROR] no username was found - called in line ' + __line);
         socket.emit('redirect', '/');
     } else {
         messages.forEach(message => {
@@ -141,7 +153,7 @@ io.on('connection', socket => {
     uploader.dir = __dirname + '/public/uploads';
     uploader.listen(socket);
 
-    socket.on('client image', fileName => {
+    socket.on('client image', (file, filename) => {
         const username = socket.request.session.username;
         if (username) {
             const today = new Date();
@@ -150,10 +162,18 @@ io.on('connection', socket => {
                 username: username,
                 message: null,
                 timestamp: time,
-                imgName: fileName
+                imgName: filename
             });
 
-            io.emit('server image', username, time, fileName);
+            saveMessage({
+                username: username,
+                message: null,
+                timestamp: time,
+                imgName: filename
+            });
+            saveFile(file, filename);
+
+            io.emit('server image', username, time, filename);
         }
     });
 
@@ -199,9 +219,38 @@ io.on('connection', socket => {
     });
 });
 
+function saveFile(file, filename) {
+    MongoClient.connect(
+        dbUrl,
+        {
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        },
+        (err, client) => {
+            if (err) {
+                console.log(err);
+            }
+
+            const filesCollection = client.db('messages').collection('files');
+
+            fs.writeFile(
+                __dirname + '/public/uploads/' + filename,
+                file,
+                'utf8',
+                err => {}
+            );
+
+            const img = file.toJSON();
+            img.filename = filename;
+
+            filesCollection.insertOne(img);
+        }
+    );
+}
+
 function connectDb() {
     MongoClient.connect(
-        uri,
+        dbUrl,
         {
             useUnifiedTopology: true,
             useNewUrlParser: true
@@ -214,10 +263,48 @@ function connectDb() {
                 .db('messages')
                 .collection('messages');
             const usersCollection = client.db('messages').collection('users');
+            const filesCollection = client.db('messages').collection('files');
 
             loadMessages(messagesCollection);
             loadUsers(usersCollection);
+            loadFiles(filesCollection);
             client.close();
+        }
+    );
+}
+
+function loadFiles(collection) {
+    MongoClient.connect(
+        dbUrl,
+        {
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        },
+        (err, client) => {
+            if (err) {
+                console.log(err);
+            }
+
+            collection
+                .find({})
+                .toArray()
+                .then(_files => {
+                    _files.forEach(file => {
+                        const img = Buffer.from(file);
+                        fs.writeFile(
+                            __dirname + '/public/uploads/' + file.filename,
+                            img,
+                            'utf8',
+                            err => {}
+                        );
+                    });
+                })
+                .finally(() => {
+                    console.log(
+                        '[INFO] successfully loaded files from mongoDB - called in line ' +
+                            __line
+                    );
+                });
         }
     );
 }
@@ -232,7 +319,10 @@ function loadUsers(collection) {
             });
         })
         .finally(() => {
-            console.log('[INFO] successfully loaded users from mongoDB');
+            console.log(
+                '[INFO] successfully loaded users from mongoDB - called in line ' +
+                    __line
+            );
         });
 }
 
@@ -246,13 +336,38 @@ function loadMessages(collection) {
             });
         })
         .finally(() => {
-            console.log('[INFO] successfully loaded messages from mongoDB');
+            console.log(
+                '[INFO] successfully loaded messages from mongoDB - called in line ' +
+                    __line
+            );
         });
+}
+
+function saveUser(user) {
+    MongoClient.connect(
+        dbUrl,
+        {
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        },
+        (err, client) => {
+            if (err) {
+                console.log(err);
+            }
+            const usersCollection = client.db('messages').collection('users');
+
+            // perform actions on the collection object
+
+            usersCollection.insertOne(user);
+
+            client.close();
+        }
+    );
 }
 
 function saveMessage(message) {
     MongoClient.connect(
-        uri,
+        dbUrl,
         {
             useUnifiedTopology: true,
             useNewUrlParser: true
@@ -274,30 +389,33 @@ function saveMessage(message) {
     );
 }
 
-function saveUser(user) {
-    MongoClient.connect(
-        uri,
-        {
-            useUnifiedTopology: true,
-            useNewUrlParser: true
-        },
-        (err, client) => {
-            if (err) {
-                console.log(err);
-            }
-            const usersCollection = client.db('messages').collection('users');
+Object.defineProperty(global, '__stack', {
+    get: function() {
+        var orig = Error.prepareStackTrace;
+        Error.prepareStackTrace = function(_, stack) {
+            return stack;
+        };
+        var err = new Error();
+        Error.captureStackTrace(err, arguments.callee);
+        var stack = err.stack;
+        Error.prepareStackTrace = orig;
+        return stack;
+    }
+});
 
-            // perform actions on the collection object
+Object.defineProperty(global, '__line', {
+    get: function() {
+        return __stack[1].getLineNumber();
+    }
+});
 
-            usersCollection.insertOne(user);
-
-            client.close();
-        }
-    );
-}
+Object.defineProperty(global, '__function', {
+    get: function() {
+        return __stack[1].getFunctionName();
+    }
+});
 
 http.listen(port, function() {
-    console.log('listening on port: 3000');
+    console.log('listening on port: 3000 - called in line ' + __line);
     connectDb();
-    //saveMessagesInterval();
 });
