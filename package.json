@@ -9,7 +9,7 @@
     "gridfs": "^1.0.0",
     "mongodb": "^3.3.2",
     "mongoose": "^5.6.12",
-    "socket.io": "^2.2.0",
+    "socket.io": "^2.5.0",
     "socketio-file-upload": "^0.7.0"
   },
   "devDependencies": {
